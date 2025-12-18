@@ -1,0 +1,184 @@
+/**
+ * Styles for the Chatbot App
+ * 
+ * Simple, clean CSS without any frameworks
+ */
+
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Main app container */
+.App {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: #f5f5f5;
+}
+
+/* Header */
+.chat-header {
+  background-color: #4a90e2;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.chat-header h1 {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* Messages container - scrollable area */
+.messages-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Individual message styling */
+.message {
+  display: flex;
+  max-width: 70%;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* User messages align to right */
+.user-message {
+  align-self: flex-end;
+  justify-content: flex-end;
+}
+
+/* AI messages align to left */
+.ai-message {
+  align-self: flex-start;
+  justify-content: flex-start;
+}
+
+/* Message content bubble */
+.message-content {
+  padding: 12px 16px;
+  border-radius: 18px;
+  word-wrap: break-word;
+  line-height: 1.4;
+}
+
+/* User message styling (blue, right-aligned) */
+.user-message .message-content {
+  background-color: #4a90e2;
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+/* AI message styling (white, left-aligned) */
+.ai-message .message-content {
+  background-color: white;
+  color: #333;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading indicator */
+.message-content.loading {
+  color: #999;
+  font-style: italic;
+}
+
+/* Input form at bottom */
+.input-form {
+  display: flex;
+  padding: 15px 20px;
+  background-color: white;
+  border-top: 1px solid #e0e0e0;
+  gap: 10px;
+}
+
+/* Message input field */
+.message-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 24px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.message-input:focus {
+  border-color: #4a90e2;
+}
+
+.message-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+/* Send button */
+.send-button {
+  padding: 12px 24px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.send-button:hover:not(:disabled) {
+  background-color: #357abd;
+}
+
+.send-button:active:not(:disabled) {
+  background-color: #2a5f94;
+}
+
+.send-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Responsive design for mobile */
+@media (max-width: 600px) {
+  .App {
+    max-width: 100%;
+  }
+
+  .message {
+    max-width: 85%;
+  }
+
+  .chat-header h1 {
+    font-size: 20px;
+  }
+}
+

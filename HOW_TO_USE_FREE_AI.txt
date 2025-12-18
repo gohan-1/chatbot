@@ -1,0 +1,55 @@
+HOW TO USE FREE AI (NO PAYMENT NEEDED!)
+=========================================
+
+Great news! Your chatbot now uses Hugging Face's FREE API by default!
+You don't need to add any API keys or payment methods - it just works!
+
+HOW IT WORKS
+------------
+- The chatbot automatically uses Hugging Face's free AI API
+- No credit card required
+- No payment needed
+- Works immediately without any setup!
+
+OPTIONAL: Get Better Rate Limits (Still FREE!)
+-----------------------------------------------
+If you want better rate limits (more requests per minute), you can optionally:
+
+1. Go to: https://huggingface.co/
+2. Sign up for a free account (no payment needed)
+3. Go to: https://huggingface.co/settings/tokens
+4. Create a new token (click "New token")
+5. Copy the token
+6. Add it to your .env file:
+   HUGGING_FACE_API_KEY=your_token_here
+
+But this is OPTIONAL - it works without it too!
+
+CURRENT SETUP
+-------------
+✅ Using Hugging Face FREE API (default)
+✅ No API key needed
+✅ No payment required
+✅ Works right now!
+
+WHAT CHANGED
+------------
+- Backend now uses Hugging Face's free API by default
+- No need to add OpenAI API key (unless you want to pay for it)
+- Chatbot works immediately with real AI responses (FREE!)
+
+TEST IT NOW
+-----------
+1. Make sure backend is running: npm start (in backend folder)
+2. Make sure frontend is running: npm start (in frontend folder)
+3. Open browser and chat - you'll get real AI responses for FREE!
+
+NOTE ABOUT RATE LIMITS
+----------------------
+- Free tier has rate limits (requests per minute)
+- If you hit the limit, wait a minute and try again
+- Adding a free Hugging Face token increases the limits
+- Still completely free - no payment ever needed!
+
+ENJOY YOUR FREE AI CHATBOT! 🎉
+

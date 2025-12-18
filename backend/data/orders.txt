@@ -1,0 +1,69 @@
+ORDER INFORMATION
+=================
+
+PLACING AN ORDER:
+1. Add items to your cart
+2. Review your cart and apply any coupons
+3. Enter shipping and billing information
+4. Select payment method
+5. Review and confirm your order
+6. Receive order confirmation email
+
+ORDER STATUS:
+- Pending: Order received, payment processing
+- Processing: Order being prepared for shipment
+- Shipped: Order has been shipped (tracking available)
+- Delivered: Order has been delivered
+- Cancelled: Order was cancelled
+
+ORDER TRACKING:
+- Check status: www.oursite.com/my-orders
+- Login with email and order number
+- Track shipments in real-time
+- Email updates sent at each stage
+
+ORDER MODIFICATIONS:
+- Cancel order: Available within 1 hour of placement
+- Change address: Contact us before order ships
+- Add items: Place a new order
+- Remove items: Cancel and reorder (if within 1 hour)
+
+ORDER ISSUES:
+- Wrong item: Contact us immediately, keep item until resolved
+- Missing items: Check all packages, contact us if item missing
+- Damaged items: Take photos, contact us for replacement
+- Late delivery: Check tracking, contact us if significantly delayed
+
+ORDER HISTORY:
+- View all past orders in your account
+- Reorder with one click
+- Download receipts and invoices
+- Track return status
+
+BULK ORDERS:
+- Orders over $500: Contact sales@oursite.com
+- Business accounts: Special pricing available
+- Volume discounts: Applied automatically at checkout
+
+QUESTIONS ABOUT ORDERS:
+Q: How do I track my order?
+A: Use your order number and email to track at www.oursite.com/my-orders or check your email for tracking updates.
+
+Q: Can I cancel my order?
+A: Yes, you can cancel within 1 hour of placing the order. After that, contact us immediately.
+
+Q: What if I receive the wrong item?
+A: Contact us immediately. Keep the item and we'll send the correct one right away.
+
+Q: How do I reorder something?
+A: Log into your account, go to order history, and click "Reorder" on any past order.
+
+Q: Can I change my order after placing it?
+A: Changes can be made within 1 hour. After that, contact us and we'll try to help if the order hasn't shipped.
+
+Q: What is my latest order?
+A: To view your latest order, log into your account at www.oursite.com/my-orders. Your most recent orders appear at the top of the list. You can also check your email for the most recent order confirmation.
+
+Q: Can I get all the order IDs?
+A: Yes, you can view all your order IDs by logging into your account at www.oursite.com/my-orders. Your order history page shows all past orders with their order numbers. You can also find order IDs in your order confirmation emails.
+

@@ -1,0 +1,57 @@
+PAYMENT INFORMATION
+===================
+
+ACCEPTED PAYMENT METHODS:
+- Credit Cards: Visa, MasterCard, American Express, Discover
+- Debit Cards: All major debit cards accepted
+- PayPal: Available at checkout
+- Apple Pay: Available for mobile orders
+- Google Pay: Available for mobile orders
+- Store Credit: Can be used for any purchase
+
+PAYMENT SECURITY:
+- All payments processed through secure SSL encryption
+- We never store your full credit card information
+- PCI DSS compliant payment processing
+- Your data is safe and secure
+
+PAYMENT ISSUES:
+- Declined cards: Check card details or contact your bank
+- Payment pending: May take 1-2 business days to process
+- Refunds: Processed to original payment method (5-7 business days)
+
+BILLING:
+- Charges appear on statement as "OurStoreName"
+- International orders: May show currency conversion
+- Multiple charges: Contact us if you see duplicate charges
+
+PAYMENT PLANS:
+- Buy Now Pay Later: Available through Klarna and Afterpay
+- Installment plans: 4 interest-free payments
+- Minimum order: $35 for payment plans
+
+GIFT CARDS:
+- Can be purchased online or in-store
+- Never expire
+- Can be used for any purchase
+- Balance can be checked online
+
+COUPONS AND DISCOUNTS:
+- One coupon per order
+- Cannot combine with other offers
+- Sale items may have additional restrictions
+- Check expiration dates
+
+QUESTIONS ABOUT PAYMENTS:
+Q: What payment methods do you accept?
+A: We accept all major credit cards, debit cards, PayPal, Apple Pay, and Google Pay.
+
+Q: Is my payment information secure?
+A: Yes, we use SSL encryption and never store your full card information.
+
+Q: How long do refunds take?
+A: Refunds are processed to your original payment method within 5-7 business days.
+
+Q: Can I use multiple coupons?
+A: Only one coupon can be used per order, and cannot be combined with other offers.
+
