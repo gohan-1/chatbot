@@ -16,10 +16,18 @@ function App() {
   // Each message has: { text: "message text", sender: "user" or "ai" }
   const [messages, setMessages] = useState([
     {
-      text: "Hello! I'm your customer service assistant. How can I help you today?",
+      text: "Hello! I'm your Samsung warranty specialist. I can help you with information about Samsung product warranties, repairs, product registration, and support services. How can I assist you today?",
       sender: "ai"
     }
   ]);
+
+  // Quick action suggestions
+  const quickActions = [
+    "What is tablet warranty period?",
+    "How long is smartphone warranty?",
+    "Cooker hood warranty period",
+    "How to register my product?"
+  ];
 
   // State to store the current input text (what user is typing)
   const [inputText, setInputText] = useState('');
@@ -112,7 +120,7 @@ function App() {
     <div className="App">
       {/* Header */}
       <header className="chat-header">
-        <h1>Customer Service Chatbot</h1>
+        <h1>Samsung Warranty Assistant</h1>
       </header>
 
       {/* Messages container */}
@@ -127,6 +135,32 @@ function App() {
             </div>
           </div>
         ))}
+
+        {/* Quick action buttons (show only when no user messages yet or after welcome) */}
+        {messages.length === 1 && (
+          <div className="quick-actions">
+            <p className="quick-actions-label">Quick questions:</p>
+            <div className="quick-actions-buttons">
+              {quickActions.map((action, index) => (
+                <button
+                  key={index}
+                  className="quick-action-btn"
+                  onClick={() => {
+                    setInputText(action);
+                    setTimeout(() => {
+                      const form = document.querySelector('.input-form');
+                      if (form) {
+                        form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                      }
+                    }, 100);
+                  }}
+                >
+                  {action}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Loading indicator when AI is responding */}
         {isLoading && (

@@ -14,6 +14,7 @@ const dotenv = require('dotenv');
 const OpenAI = require('openai');
 const fs = require('fs');
 const path = require('path');
+const { getWarrantyWithCache, getProductsWithCache, clearWarrantyCache } = require('./scraper');
 
 // Load environment variables from .env file
 // This keeps your API key secret and out of your code
@@ -142,6 +143,8 @@ function getDataFromFile(topic) {
       fileName = 'payments.txt';
     } else if (topic === 'order' || topic === 'orders' || topic === 'tracking') {
       fileName = 'orders.txt';
+    } else if (topic === 'warranty' || topic === 'warranties') {
+      fileName = 'warranty.txt';
     } else {
       return null; // No matching file
     }
@@ -164,6 +167,31 @@ function getDataFromFile(topic) {
 }
 
 /**
+ * Get warranty knowledge base content
+ * This fetches from live website first, then falls back to warranty.txt file
+ * Uses caching to avoid too many requests
+ */
+async function getWarrantyKnowledgeBase() {
+  try {
+    // Try to get from live website (with caching)
+    const warrantyData = await getWarrantyWithCache();
+    return warrantyData;
+  } catch (error) {
+    console.error('Error getting warranty knowledge base:', error);
+    // Fallback to file
+    try {
+      const warrantyPath = path.join(__dirname, 'data', 'warranty.txt');
+      if (fs.existsSync(warrantyPath)) {
+        return fs.readFileSync(warrantyPath, 'utf8');
+      }
+    } catch (fileError) {
+      console.error('Error reading warranty file:', fileError);
+    }
+    return null;
+  }
+}
+
+/**
  * Extract answer from data file based on user question
  */
 function getAnswerFromData(userMessage, dataContent) {
@@ -172,7 +200,118 @@ function getAnswerFromData(userMessage, dataContent) {
   const message = userMessage.toLowerCase();
   const lines = dataContent.split('\n');
   
-  // Look for Q&A sections first
+  // First, try to find product-specific warranty information
+  // Look for product names followed by warranty period
+  const productKeywords = {
+    'tablet': ['tablet', 'tab'],
+    'smartphone': ['smartphone', 'phone', 'galaxy'],
+    'watch': ['watch', 'gear'],
+    'buds': ['buds', 'headphone', 'earphone'],
+    'charger': ['charger'],
+    'battery': ['battery'],
+    's pen': ['s pen', 'spen', 'pen'],
+    'strap': ['strap', 'band'],
+    'ring': ['ring', 'galaxy ring'],
+    'cooker hood': ['cooker hood', 'hood', 'cooker'],
+    'vacuum cleaners': ['vacuum cleaners', 'vacuum cleaner', 'vacuum', 'robotic vacuum'],
+    'robotic vacuum cleaners': ['robotic vacuum cleaners', 'robotic vacuum']
+  };
+  
+  // Find matching product
+  let matchedProduct = null;
+  for (const [product, keywords] of Object.entries(productKeywords)) {
+    if (keywords.some(keyword => message.includes(keyword))) {
+      matchedProduct = product;
+      break;
+    }
+  }
+  
+  // If we found a product, extract its warranty information
+  if (matchedProduct) {
+    let inProductSection = false;
+    let productSection = '';
+    let warrantyPeriod = null;
+    let repairServices = [];
+    let warrantyService = null;
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      const lineLower = line.toLowerCase();
+      
+      // Check if we're entering a product section
+      if (line.match(/^[A-Z\s]+:$/) && !line.includes('===')) {
+        const productName = line.replace(':', '').toLowerCase();
+        if (productName.includes(matchedProduct) || 
+            (matchedProduct === 'tablet' && productName === 'tablet') ||
+            (matchedProduct === 'smartphone' && (productName.includes('smartphone') || productName.includes('phone'))) ||
+            (matchedProduct === 'watch' && (productName.includes('watch') || productName.includes('gear'))) ||
+            (matchedProduct === 'buds' && (productName.includes('buds') || productName.includes('headphone'))) ||
+            (matchedProduct === 'charger' && productName.includes('charger')) ||
+            (matchedProduct === 'battery' && productName.includes('battery')) ||
+            (matchedProduct === 's pen' && productName.includes('pen')) ||
+            (matchedProduct === 'strap' && productName.includes('strap')) ||
+            (matchedProduct === 'ring' && productName.includes('ring')) ||
+            (matchedProduct === 'cooker hood' && (productName.includes('cooker hood') || productName.includes('hood'))) ||
+            (matchedProduct === 'vacuum cleaners' && (productName.includes('vacuum') || productName.includes('cleaner'))) ||
+            (matchedProduct === 'robotic vacuum cleaners' && (productName.includes('robotic vacuum') || productName.includes('robotic')))) {
+          inProductSection = true;
+          productSection = line;
+          continue;
+        } else if (inProductSection && line.match(/^[A-Z\s]+:$/)) {
+          // We've moved to a new section, break
+          break;
+        }
+      }
+      
+      if (inProductSection) {
+        // Extract warranty period
+        if (line.match(/- Warranty period:/i)) {
+          const match = line.match(/Warranty period:\s*(\d+)\s*Months?/i);
+          if (match) {
+            warrantyPeriod = match[1] + ' Months';
+          }
+        }
+        
+        // Extract warranty service
+        if (line.match(/- Warranty service offered:/i)) {
+          warrantyService = line.replace(/- Warranty service offered:\s*/i, '').trim();
+        }
+        
+        // Extract repair services
+        if (line.match(/- Repair services available:/i)) {
+          const nextLines = [];
+          for (let j = i + 1; j < lines.length && j < i + 10; j++) {
+            const nextLine = lines[j].trim();
+            if (nextLine.match(/^- /)) {
+              nextLines.push(nextLine.replace(/^- /, ''));
+            } else if (nextLine.match(/^[A-Z]/) || nextLine === '') {
+              break;
+            }
+          }
+          repairServices = nextLines;
+        }
+        
+        // Stop if we hit another major section
+        if (line.startsWith('===') || (line.match(/^[A-Z\s]+:$/) && !line.includes(productSection))) {
+          break;
+        }
+      }
+    }
+    
+    // Build response if we found warranty information
+    if (warrantyPeriod) {
+      let response = `Warranty period: ${warrantyPeriod}`;
+      if (warrantyService) {
+        response += `. ${warrantyService}`;
+      }
+      if (repairServices.length > 0) {
+        response += `. Repair services available: ${repairServices.join(', ')}.`;
+      }
+      return response;
+    }
+  }
+  
+  // Look for Q&A sections
   let inQA = false;
   let currentQ = '';
   let currentA = '';
@@ -423,8 +562,23 @@ function getImprovedMockResponse(userMessage) {
     return "Thank you for contacting us! Have a wonderful day! If you need anything else, feel free to reach out anytime.";
   }
   
+  // Note: This function is synchronous, so for warranty questions we'll use the file directly
+  // The async getWarrantyKnowledgeBase is used in the main API handler
+  if (message.match(/(warranty|warranties|repair|service|guarantee|coverage|register.*product|extended.*warranty|international.*warranty|samsung.*warranty|tablet|smartphone|phone|watch|buds|headphone|charger|battery)/)) {
+    const data = getDataFromFile('warranty');
+    if (data) {
+      const answer = getAnswerFromData(userMessage, data);
+      if (answer && answer.length > 10) {
+        console.log('Found warranty answer from knowledge base:', answer);
+        return answer;
+      }
+      // Fallback
+      return "I can help you with Samsung warranty information. All Samsung products come with a standard manufacturer's warranty. You can register your product online through My Page for faster support. Would you like to know more about warranty periods for specific products or how to book a repair?";
+    }
+  }
+  
   // Default friendly response
-  return "I can help you with information about returns, shipping, payments, and orders. Could you tell me what specific topic you'd like to know more about?";
+  return "I'm a Samsung warranty specialist. I can help you with information about Samsung product warranties, repairs, product registration, and support services. What would you like to know?";
 }
 
 /**
@@ -455,26 +609,86 @@ app.post('/api/chat', async (req, res) => {
 
     let aiResponse;
 
-    // Priority: 1. Hugging Face (FREE), 2. OpenAI (paid), 3. Mock responses
+    // Priority: 1. OpenAI (with warranty knowledge base), 2. Hugging Face (FREE), 3. Mock responses
+    console.log('USE_OPENAI:', USE_OPENAI, 'OPENAI_API_KEY exists:', !!OPENAI_API_KEY);
     if (USE_OPENAI) {
-      // Use OpenAI if API key is provided
-      console.log('Using OpenAI API for:', message);
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a helpful and friendly customer service representative. Answer questions clearly and professionally.'
-          },
-          {
-            role: 'user',
-            content: message
+      try {
+        // Use OpenAI if API key is provided
+        console.log('Using OpenAI API for:', message);
+        
+        // Load warranty knowledge base (from live website or file)
+        const warrantyKB = await getWarrantyKnowledgeBase();
+        
+        // Create system prompt with warranty knowledge base
+        let systemPrompt = `You are a Samsung warranty specialist customer service representative. Your ONLY job is to answer questions using the EXACT information from the Samsung warranty knowledge base provided below.
+
+CRITICAL INSTRUCTIONS:
+1. ALWAYS look up the answer in the knowledge base first - DO NOT make up or guess information
+2. For warranty period questions, find the product in the knowledge base and state the EXACT warranty period (e.g., "24 Months", "12 Months", "6 Months")
+3. Use the EXACT wording and format from the knowledge base when possible
+4. Be direct and specific - don't give generic responses when you have specific information
+5. If asked about a product warranty period, respond with: "Warranty period: [X] Months" where X is the exact number from the knowledge base
+6. Include relevant additional information from the knowledge base (repair services, etc.) when helpful
+
+Example responses:
+- Question: "What is tablet warranty period?" 
+  Answer: "Warranty period: 24 Months. Our Samsung Authorised Service Partners offer both In and Out of warranty repairs. Repair services available: In-store repair, Pick up repair, Doorstep repair."
+
+- Question: "How long is smartphone warranty?"
+  Answer: "Warranty period: 24 Months. Our Samsung Authorised Service Partners offer both In and Out of warranty repairs. Repair services available: In-store repair, Pick up repair, Doorstep repair."
+
+DO NOT give generic responses like "I can help you with warranty information" when you have the specific answer in the knowledge base. ALWAYS provide the exact warranty period and relevant details.`;
+
+        // Add warranty knowledge base to system prompt
+        if (warrantyKB) {
+          systemPrompt += `\n\n=== SAMSUNG WARRANTY KNOWLEDGE BASE (USE THIS TO ANSWER ALL QUESTIONS) ===\n${warrantyKB}\n\n=== END OF KNOWLEDGE BASE ===\n\nRemember: Use the EXACT information from the knowledge base above. For warranty period questions, find the product section and state the exact warranty period.`;
+        } else {
+          systemPrompt += `\n\nNote: The warranty knowledge base is currently unavailable. Provide general helpful responses and guide customers to contact Samsung support for specific warranty information.`;
+        }
+        
+        const completion = await openai.chat.completions.create({
+          model: 'gpt-3.5-turbo',
+          messages: [
+            {
+              role: 'system',
+              content: systemPrompt
+            },
+            {
+              role: 'user',
+              content: message
+            }
+          ],
+          max_tokens: 500,
+          temperature: 0.3
+        });
+        aiResponse = completion.choices[0].message.content;
+      } catch (openaiError) {
+        // If OpenAI fails, log the error and fall back
+        console.error('OpenAI API error:', openaiError.message);
+        console.log('Falling back to warranty knowledge base extraction...');
+        // Try to use warranty knowledge base directly for warranty questions
+        const messageLower = message.toLowerCase();
+        if (messageLower.match(/(warranty|warranties|tablet|smartphone|phone|watch|buds|headphone|charger|battery|s pen|strap)/)) {
+          try {
+            const warrantyKB = await getWarrantyKnowledgeBase();
+            if (warrantyKB) {
+              const answer = getAnswerFromData(message, warrantyKB);
+              if (answer) {
+                aiResponse = answer;
+              } else {
+                aiResponse = getImprovedMockResponse(message);
+              }
+            } else {
+              aiResponse = getImprovedMockResponse(message);
+            }
+          } catch (kbError) {
+            console.error('Error getting warranty KB in fallback:', kbError);
+            aiResponse = getImprovedMockResponse(message);
           }
-        ],
-        max_tokens: 500,
-        temperature: 0.7
-      });
-      aiResponse = completion.choices[0].message.content;
+        } else {
+          aiResponse = getImprovedMockResponse(message);
+        }
+      }
     } else if (USE_HUGGING_FACE) {
       // Use Hugging Face FREE API (no payment needed!)
       console.log('Using Hugging Face FREE API for:', message);
@@ -492,7 +706,21 @@ app.post('/api/chat', async (req, res) => {
 
   } catch (error) {
     // Handle errors gracefully
-    console.error('Error calling OpenAI:', error);
+    console.error('Error in /api/chat:', error);
+    
+    // Try to provide a helpful response even on error
+    try {
+      const warrantyKB = await getWarrantyKnowledgeBase();
+      const messageLower = message.toLowerCase();
+      if (warrantyKB && messageLower.match(/(warranty|warranties|tablet|smartphone|phone|watch|buds)/)) {
+        const answer = getAnswerFromData(message, warrantyKB);
+        if (answer) {
+          return res.json({ response: answer });
+        }
+      }
+    } catch (fallbackError) {
+      console.error('Fallback also failed:', fallbackError);
+    }
     
     // Send error message to frontend
     res.status(500).json({ 
@@ -510,11 +738,46 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'Server is running!' });
 });
 
+/**
+ * Clear warranty cache endpoint
+ * Useful for forcing a refresh of warranty data from website
+ */
+app.post('/api/clear-cache', (req, res) => {
+  try {
+    clearWarrantyCache();
+    res.json({ status: 'Cache cleared successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to clear cache', details: error.message });
+  }
+});
+
+/**
+ * Get warranty data endpoint (for testing)
+ */
+app.get('/api/warranty-data', async (req, res) => {
+  try {
+    const warrantyData = await getWarrantyKnowledgeBase();
+    res.json({ 
+      status: 'success',
+      source: warrantyData ? 'live' : 'file',
+      data: warrantyData ? warrantyData.substring(0, 500) + '...' : 'No data available'
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get warranty data', details: error.message });
+  }
+});
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);
   if (USE_OPENAI) {
-    console.log(`✅ Using OpenAI API (paid service)`);
+    console.log(`✅ Using OpenAI API with Samsung Warranty Knowledge Base`);
+    const warrantyKB = getWarrantyKnowledgeBase();
+    if (warrantyKB) {
+      console.log(`📚 Warranty knowledge base loaded successfully`);
+    } else {
+      console.log(`⚠️  Warning: Warranty knowledge base not found`);
+    }
   } else if (USE_HUGGING_FACE) {
     console.log(`🆓 Using Hugging Face FREE API (no payment needed!)`);
     console.log(`💡 Optional: Add HUGGING_FACE_API_KEY to .env for better rate limits`);
