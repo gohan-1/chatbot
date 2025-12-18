@@ -214,7 +214,11 @@ function getAnswerFromData(userMessage, dataContent) {
     'ring': ['ring', 'galaxy ring'],
     'cooker hood': ['cooker hood', 'hood', 'cooker'],
     'vacuum cleaners': ['vacuum cleaners', 'vacuum cleaner', 'vacuum', 'robotic vacuum'],
-    'robotic vacuum cleaners': ['robotic vacuum cleaners', 'robotic vacuum']
+    'robotic vacuum cleaners': ['robotic vacuum cleaners', 'robotic vacuum'],
+    'monitor': ['monitor', 'monitors', 'display', 'monitor for consumers'],
+    'large format display': ['large format display', 'large format'],
+    'set back box': ['set back box', 'sbb', 'back box'],
+    'oled monitor': ['oled monitor', 'oled monitor for consumers', 'oled']
   };
   
   // Find matching product
@@ -253,7 +257,11 @@ function getAnswerFromData(userMessage, dataContent) {
             (matchedProduct === 'ring' && productName.includes('ring')) ||
             (matchedProduct === 'cooker hood' && (productName.includes('cooker hood') || productName.includes('hood'))) ||
             (matchedProduct === 'vacuum cleaners' && (productName.includes('vacuum') || productName.includes('cleaner'))) ||
-            (matchedProduct === 'robotic vacuum cleaners' && (productName.includes('robotic vacuum') || productName.includes('robotic')))) {
+            (matchedProduct === 'robotic vacuum cleaners' && (productName.includes('robotic vacuum') || productName.includes('robotic'))) ||
+            (matchedProduct === 'monitor' && (productName.includes('monitor') || productName.includes('display'))) ||
+            (matchedProduct === 'large format display' && (productName.includes('large format') || productName.includes('format display'))) ||
+            (matchedProduct === 'set back box' && (productName.includes('set back box') || productName.includes('sbb') || productName.includes('back box'))) ||
+            (matchedProduct === 'oled monitor' && (productName.includes('oled monitor') || productName.includes('oled')))) {
           inProductSection = true;
           productSection = line;
           continue;

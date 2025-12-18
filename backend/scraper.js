@@ -65,7 +65,15 @@ async function fetchWarrantyFromWebsite() {
       'robotic vacuum cleaners': { period: '24 Months', services: ['In-store repair', 'Pick up repair', 'Doorstep repair'] },
       'robotic vacuum': { period: '24 Months', services: ['In-store repair', 'Pick up repair', 'Doorstep repair'] },
       'vacuum cleaners': { period: '24 Months', services: ['In-store repair', 'Pick up repair', 'Doorstep repair'] },
-      'vacuum cleaner': { period: '24 Months', services: ['In-store repair', 'Pick up repair', 'Doorstep repair'] }
+      'vacuum cleaner': { period: '24 Months', services: ['In-store repair', 'Pick up repair', 'Doorstep repair'] },
+      // Display Products
+      'large format display': { period: '36 Months', services: ['In-store repair', 'Pick up repair', 'Doorstep repair'] },
+      'set back box': { period: '36 Months', services: ['In-store repair', 'Pick up repair', 'Doorstep repair'] },
+      'sbb': { period: '36 Months', services: ['In-store repair', 'Pick up repair', 'Doorstep repair'] },
+      'monitor': { period: '24 Months', services: ['In-store repair', 'Pick up repair', 'Doorstep repair'] },
+      'monitor for consumers': { period: '24 Months', services: ['In-store repair', 'Pick up repair', 'Doorstep repair'] },
+      'oled monitor': { period: '24 Months', services: ['In-store repair', 'Pick up repair', 'Doorstep repair'] },
+      'oled monitor for consumers': { period: '24 Months', services: ['In-store repair', 'Pick up repair', 'Doorstep repair'] }
     };
 
     // Try to extract warranty information from the page content
@@ -139,6 +147,28 @@ async function fetchWarrantyFromWebsite() {
       warrantyInfo += '- Warranty period: 12 Months\n';
       warrantyInfo += '- Warranty service offered: Our Samsung Authorised Service Partners offer both In and Out of warranty repairs.\n';
       warrantyInfo += '- Repair services available: Pick up repair\n\n';
+      
+      // Add Display Products warranty information
+      warrantyInfo += '=== DISPLAY PRODUCTS WARRANTY ===\n\n';
+      warrantyInfo += 'LARGE FORMAT DISPLAY:\n';
+      warrantyInfo += '- Warranty period: 36 Months\n';
+      warrantyInfo += '- Warranty service offered: Our Samsung Authorised Service Partners offer both In and Out of warranty repairs.\n';
+      warrantyInfo += '- Repair services available: In-store repair, Pick up repair, Doorstep repair\n\n';
+      
+      warrantyInfo += 'SET BACK BOX - SBB:\n';
+      warrantyInfo += '- Warranty period: 36 Months\n';
+      warrantyInfo += '- Warranty service offered: Our Samsung Authorised Service Partners offer both In and Out of warranty repairs.\n';
+      warrantyInfo += '- Repair services available: In-store repair, Pick up repair, Doorstep repair\n\n';
+      
+      warrantyInfo += 'MONITOR (FOR CONSUMERS):\n';
+      warrantyInfo += '- Warranty period: 24 Months\n';
+      warrantyInfo += '- Warranty service offered: Our Samsung Authorised Service Partners offer both In and Out of warranty repairs.\n';
+      warrantyInfo += '- Repair services available: In-store repair, Pick up repair, Doorstep repair\n\n';
+      
+      warrantyInfo += 'OLED MONITOR (FOR CONSUMERS):\n';
+      warrantyInfo += '- Warranty period: 24 Months\n';
+      warrantyInfo += '- Warranty service offered: Our Samsung Authorised Service Partners offer both In and Out of warranty repairs.\n';
+      warrantyInfo += '- Repair services available: In-store repair, Pick up repair, Doorstep repair\n\n';
     }
 
     // Extract FAQ information from the page
