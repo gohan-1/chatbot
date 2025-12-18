@@ -16,17 +16,17 @@ function App() {
   // Each message has: { text: "message text", sender: "user" or "ai" }
   const [messages, setMessages] = useState([
     {
-      text: "Hello! I'm your Samsung warranty specialist. I can help you with information about Samsung product warranties, repairs, product registration, and support services. How can I assist you today?",
+      text: "👋 Hello! I'm your Samsung warranty specialist. I can help you with information about Samsung product warranties, repairs, product registration, and support services. How can I assist you today?",
       sender: "ai"
     }
   ]);
 
-  // Quick action suggestions
+  // Quick action suggestions with emojis
   const quickActions = [
-    "What is tablet warranty period?",
-    "How long is smartphone warranty?",
-    "Cooker hood warranty period",
-    "How to register my product?"
+    { text: "What is tablet warranty period?", emoji: "📱" },
+    { text: "How long is smartphone warranty?", emoji: "📲" },
+    { text: "Cooker hood warranty period", emoji: "🍳" },
+    { text: "How to register my product?", emoji: "📝" }
   ];
 
   // State to store the current input text (what user is typing)
@@ -99,7 +99,7 @@ function App() {
       // If something goes wrong, show error message
       console.error('Error:', error);
       setMessages(prev => [...prev, {
-        text: 'Sorry, I encountered an error. Please try again.',
+        text: '😔 Sorry, I encountered an error. Please try again.',
         sender: 'ai'
       }]);
     } finally {
@@ -120,7 +120,14 @@ function App() {
     <div className="App">
       {/* Header */}
       <header className="chat-header">
-        <h1>Samsung Warranty Assistant</h1>
+        <div className="header-content">
+          <div className="header-icon">🤖</div>
+          <h1>Samsung Warranty Assistant</h1>
+          <div className="header-status">
+            <span className="status-dot"></span>
+            <span>Online</span>
+          </div>
+        </div>
       </header>
 
       {/* Messages container */}
@@ -129,10 +136,17 @@ function App() {
           <div
             key={index}
             className={`message ${message.sender === 'user' ? 'user-message' : 'ai-message'}`}
+            style={{ animationDelay: `${index * 0.1}s` }}
           >
+            {message.sender === 'ai' && (
+              <div className="message-avatar ai-avatar">🤖</div>
+            )}
             <div className="message-content">
               {message.text}
             </div>
+            {message.sender === 'user' && (
+              <div className="message-avatar user-avatar">👤</div>
+            )}
           </div>
         ))}
 
@@ -146,7 +160,7 @@ function App() {
                   key={index}
                   className="quick-action-btn"
                   onClick={() => {
-                    setInputText(action);
+                    setInputText(action.text);
                     setTimeout(() => {
                       const form = document.querySelector('.input-form');
                       if (form) {
@@ -155,7 +169,8 @@ function App() {
                     }, 100);
                   }}
                 >
-                  {action}
+                  <span className="quick-action-emoji">{action.emoji}</span>
+                  {action.text}
                 </button>
               ))}
             </div>
@@ -164,9 +179,14 @@ function App() {
 
         {/* Loading indicator when AI is responding */}
         {isLoading && (
-          <div className="message ai-message">
+          <div className="message ai-message typing-indicator">
+            <div className="message-avatar ai-avatar">🤖</div>
             <div className="message-content loading">
-              AI is typing...
+              <span className="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+              </span>
             </div>
           </div>
         )}
@@ -177,20 +197,24 @@ function App() {
 
       {/* Input form */}
       <form className="input-form" onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-          placeholder="Type your message here..."
-          className="message-input"
-          disabled={isLoading} // Disable input while waiting for response
-        />
+        <div className="input-wrapper">
+          <span className="input-emoji">💬</span>
+          <input
+            type="text"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            placeholder="Type your message here..."
+            className="message-input"
+            disabled={isLoading} // Disable input while waiting for response
+          />
+        </div>
         <button
           type="submit"
           className="send-button"
           disabled={isLoading || !inputText.trim()}
         >
-          Send
+          <span className="send-icon">🚀</span>
+          <span className="send-text">Send</span>
         </button>
       </form>
     </div>
